@@ -370,7 +370,7 @@ export default class NetworkController {
     this.networkFile.write();
   }
 
-  // DeployerController
+  //ProjectController/PackageController
   public async freeze(): Promise<void | never> {
     if (!this.packageAddress) throw Error('Cannot freeze an unpublished project');
     await this.fetchOrDeploy(this.currentVersion);
@@ -424,7 +424,8 @@ export default class NetworkController {
     }
   }
 
-  // Proxy model
+  //Proxy model
+  // this should be called createInstance.
   public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ContractWrapper> {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
@@ -473,7 +474,8 @@ export default class NetworkController {
     }
   }
 
-  // Proxy model
+  //Proxy model
+  //set upgradeability admin
   public async setProxiesAdmin(packageName: string, contractAlias: string, proxyAddress: string, newAdmin: string): Promise<ProxyInterface[]> {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
@@ -483,6 +485,7 @@ export default class NetworkController {
   }
 
   // Proxy model
+  //changeUpgradeabilityAdmin
   private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: SimpleProject | AppProject = null): Promise<void> {
     if (!project) project = this.project;
     await allPromisesOrError(_.map(proxies, async (aProxy) => {
@@ -492,6 +495,7 @@ export default class NetworkController {
   }
 
   // Proxy model
+  //upgradeInstance
   public async upgradeProxies(packageName: string, contractAlias: string, proxyAddress: string, initMethod: string, initArgs: string[]): Promise<ProxyInterface[]> {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];

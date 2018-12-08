@@ -23,6 +23,7 @@ export default class LocalController {
     this.packageFile = packageFile;
   }
 
+  // ProjectController/LocalController
   public init(name: string, version: string, force: boolean = false, publish: boolean = false): void {
     this.initZosPackageFile(name, version, force);
     Session.ignoreFile();
@@ -30,6 +31,7 @@ export default class LocalController {
     if (publish) this.packageFile.publish = publish;
   }
 
+  // ProjectController/LocalController
   public initZosPackageFile(name: string, version: string, force: boolean = false): void | never {
     if (this.packageFile.exists() && !force) {
       throw Error(`Cannot overwrite existing file ${this.packageFile.fileName}`);
@@ -42,15 +44,18 @@ export default class LocalController {
     this.packageFile.contracts = {};
   }
 
+  // ProjectController/LocalController
   public bumpVersion(version: string): void {
     this.packageFile.version = version;
   }
 
+  // ContractsController
   public add(contractAlias: string, contractName: string): void {
     log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`);
     this.packageFile.addContract(contractAlias, contractName);
   }
 
+  // ContractsController
   public addAll(): void {
     const folder = Contracts.getLocalBuildDir();
     fs.readDir(folder).forEach((file) => {
@@ -63,6 +68,7 @@ export default class LocalController {
     });
   }
 
+  // ContractsController
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
       log.error(`Contract ${contractAlias} to be removed was not found`);
@@ -72,6 +78,7 @@ export default class LocalController {
     }
   }
 
+  // ContractController
   public checkCanAdd(contractName: string): void | never {
     const path = Contracts.getLocalPath(contractName);
     if (!fs.exists(path)) {
@@ -82,7 +89,7 @@ export default class LocalController {
     }
   }
 
-  // Contract model
+  // ContractsValidator
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
     return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
@@ -90,7 +97,7 @@ export default class LocalController {
     )));
   }
 
-  // Contract model
+  // ContractValidator
   public validate(contractAlias: string, buildArtifacts?: BuildArtifacts): boolean {
     const contractName = this.packageFile.contract(contractAlias);
     const contractClass = Contracts.getFromLocal(contractName || contractAlias);
@@ -99,7 +106,7 @@ export default class LocalController {
     return validationPasses(warnings);
   }
 
-  // Contract model
+  // ContractValidator
   public hasBytecode(contractDataPath: string): boolean {
     if (!fs.exists(contractDataPath)) return false;
     const bytecode = fs.parseJson(contractDataPath).bytecode;
@@ -107,6 +114,7 @@ export default class LocalController {
   }
 
   // Contract model
+  // cli's Contract model
   public getContractClass(packageName: string, contractAlias: string): ContractFactory {
     if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
@@ -119,6 +127,7 @@ export default class LocalController {
   }
 
   // Contract model
+  // lib Contract model
   public getContractSourcePath(contractAlias: string): { sourcePath: string, compilerVersion: string } | never {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
@@ -130,11 +139,13 @@ export default class LocalController {
     }
   }
 
+  // ProjectController/LocalController/BaseController
+  // Consider merging all methods related to writing files (ie, writing network and local files)
   public writePackage(): void {
     this.packageFile.write();
   }
 
-  // DependencyController
+  //  DependencyController
   public async linkDependencies(dependencies: string[], installDependencies: boolean = false): Promise<void> {
     await Promise.all(dependencies.map(async (depNameVersion: string) => {
       const dependency = installDependencies
@@ -144,13 +155,14 @@ export default class LocalController {
     }));
   }
 
-  // DependencyController
+  //  DependencyController
   public unlinkDependencies(dependenciesNames: string[]): void {
     dependenciesNames
       .map((dep) => Dependency.fromNameWithVersion(dep))
       .forEach((dep) => this.packageFile.unsetDependency(dep.name));
   }
 
+  //  se va!
   public onNetwork(network: string, txParams: any, networkFile?: ZosNetworkFile): NetworkController {
     return new NetworkController(this, network, txParams, networkFile);
   }
