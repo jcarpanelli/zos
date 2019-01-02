@@ -3,12 +3,15 @@ import { Logger } from 'zos-lib';
 
 import ControllerFor from '../models/network/ControllerFor';
 import NetworkController from '../models/network/NetworkController';
+import StatusController from '../controllers/StatusController'
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 import { StatusParams }from './interfaces';
 
 const log: Logger = new Logger('scripts/status');
 
 export default async function status({ network, txParams = {}, networkFile }: StatusParams): Promise<void> {
+  // TODO: Replace ControllerFor with NetworkControllers' constructor
+  //const statusController = new StatusController(network, txParams, networkFile)
   const controller = ControllerFor(network, txParams, networkFile);
   log.info(`Project status for network ${network}`);
 
