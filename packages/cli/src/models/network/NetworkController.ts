@@ -380,7 +380,7 @@ export default class NetworkController {
 
   // DeployerController
   get isPublished(): boolean {
-    return this.packageFile.isPublished || this.appAddress !== undefined
+    return this.packageFile.publishByDefault || this.appAddress !== undefined
   }
 
   // DeployerController

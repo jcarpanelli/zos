@@ -67,7 +67,7 @@ export default class ZosPackageFile {
     return Object.values(this.contracts);
   }
 
-  get isPublished(): boolean {
+  get publishByDefault(): boolean {
     return !!this.data.publish;
   }
 

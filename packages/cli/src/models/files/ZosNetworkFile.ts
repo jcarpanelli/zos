@@ -121,8 +121,8 @@ export default class ZosNetworkFile {
     return Object.keys(this.contracts);
   }
 
-  get isPublished(): boolean {
-    return this.packageFile.isPublished;
+  get publishByDefault(): boolean {
+    return this.packageFile.publishByDefault;
   }
 
   get solidityLibs(): { [libAlias: string]: SolidityLibInterface } {
