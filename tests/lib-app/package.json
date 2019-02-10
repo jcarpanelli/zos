@@ -1,0 +1,14 @@
+{
+  "name": "lib-app-tests",
+  "version": "2.2.0-rc.0",
+  "description": "Integration tests for the lib module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jota@zeppelin.solutions",
+  "license": "MIT",
+  "dependencies": {
+    "zos-lib": "^2.1.2"
+  }
+}
