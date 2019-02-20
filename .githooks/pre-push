@@ -1,2 +1,2 @@
 #!/bin/sh
-npx lerna run lint && git commit -m "Run lintfix"
+npx lerna run lint && git commit -m "Autorun lintfix"
