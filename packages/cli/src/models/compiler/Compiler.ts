@@ -1,26 +1,21 @@
 import { execFile, ExecException } from 'child_process';
 import { FileSystem, Contracts, Logger } from 'zos-lib';
+import { promisify } from 'util';
+const execFileAsync = promisify(execFile);
 
 const log = new Logger('Compiler');
 
 const Compiler = {
-  async call(): Promise<{ stdout: string, stderr: string }> {
-    log.info('Compiling contracts with Truffle...');
+  async call(): Promise<void | ExecException> {
     let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`;
+    log.info('Compiling contracts with Truffle...');
     if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
-
-    return new Promise((resolve, reject) => {
-      execFile(truffleBin, ['compile', '--all'], (error: ExecException, stdout, stderr) => {
-        if (error) {
-          if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-        if (stdout) console.log(stdout);
-        if (stderr) console.error(stderr);
-      });
-    });
+    try {
+      const { stdout } = await execFileAsync(truffleBin, ['compile', '--all']);
+      log.warn(stdout);
+    } catch(error) {
+      throw Error(error.stdout);
+    }
   }
 };
 
