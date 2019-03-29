@@ -38,10 +38,10 @@ const register: (program: any) => any = (program) => program
 async function action(contractFullName: string, options: any): Promise<void> {
   const { force } = options;
   const createParams = await promptForCreate(contractFullName, options);
-  if (!await hasToMigrateProject(createParams.network)) process.exit(0);
 
   // get network and prompt for initialize method and arguments
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...createParams });
+  if (!await hasToMigrateProject(network)) process.exit(0);
   const initParams = await promptForInitParams(createParams.contractFullName, options);
   const { contract: contractAlias, package: packageName } = fromContractFullName(createParams.contractFullName);
   const args = pickBy({ packageName, contractAlias, ...initParams, force });
@@ -55,9 +55,10 @@ async function promptForCreate(contractFullName: string, options: any): Promise<
   const { force, network: networkInOpts } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaultOpts = { network: networkInSession };
+  const args = { contractFullName };
   const opts = { network: networkInOpts || !expired ? networkInSession : undefined };
 
-  return promptIfNeeded({ args: { contractFullName }, opts, defaults: defaultOpts, props: baseProps });
+  return promptIfNeeded({ args, opts, defaults: defaultOpts, props: baseProps });
 }
 
 async function promptForInitParams(contractFullName: string, options: any) {
