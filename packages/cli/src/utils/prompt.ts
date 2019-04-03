@@ -1,5 +1,7 @@
+import uniqBy from 'lodash.uniqby';
 import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
+import groupBy from 'lodash.groupby';
 import inquirer from 'inquirer';
 
 import Truffle from '../models/initializer/truffle/Truffle';
@@ -19,9 +21,14 @@ interface GenericObject {
   [key: string]: any;
 }
 
-type Choices = Array<{ name: string, value: string } | string>;
-
-// TS-TODO: Define a more accurate return type as soon as we know the final structure of it
+/*
+ * This function will parse and wrap both arguments and options into inquirer questions, where
+ * the 'arguments' are the parameters sent right after the command name, e.g., * zos create Foo
+ * (Foo is the argument) and the optionn are the parameters sent right after a flag * e.g.,
+ * zos push --network local (local is the option). On the other hand, `props` is an object with some
+ * inquirer questions values (such as question type, message and name) and `defaults` is an object with
+ * default values for each args/props attributes.
+ * */
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args, interactive: boolean = true): Promise<any> {
   const argsQuestions = Object.keys(args)
     .filter(argName => args[argName] === undefined || isEmpty(args[argName]))
@@ -41,6 +48,33 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
 export function networksList(type: string): GenericObject {
   const networks = Truffle.getNetworkNamesFromConfig();
   return genericInquirerQuestion('network', 'Select a network from the network list', type, networks);
+}
+
+// Gets a list of all proxies, grouped by package (local contracts first)
+export function proxiesList(network: string): GenericObject {
+  return answer => {
+    const packageFile = new ZosPackageFile();
+    const networkFile = packageFile.networkFile(network);
+    const proxies = networkFile.getProxies();
+    const groupedByPackage = groupBy(proxies, 'package');
+    const list = Object.keys(groupedByPackage)
+      .map(packageName => {
+        const separator = packageName === packageFile.name ? 'Local contracts' : packageName;
+        const packageList = groupedByPackage[packageName]
+          .map(({ contract, address }) => {
+            const name = answer.pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
+            const contractFullName = packageName === packageFile.name ? `${contract}` : `${packageName}/${contract}`;
+            return {
+              name,
+              value: { address, contractFullName },
+            };
+          });
+
+        return [new inquirer.Separator(` = ${separator} =`), ...uniqBy(packageList, 'name')];
+      });
+
+    return flatten(list);
+  };
 }
 
 // Generates an inquirer question with a list of contracts names
@@ -84,16 +118,16 @@ export function contractsList(name: string, message: string, type: string, sourc
 
 // Returns an inquirer question with a list of methods names for a particular contract
 export function methodsList(contractFullName: string): GenericObject {
-  const methods = contractMethods(contractFullName)
+  return contractMethods(contractFullName)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? `[Initializable] ` : '';
       const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
       const label = `${initializable}${name}(${args.join(', ')})`;
 
-      return { name: label, value: { name, selector }};
+      return { name: label, value: { name, selector } };
     });
 
-  return genericInquirerQuestion('initMethod', 'Select a method', 'list', methods);
+  // return genericInquirerQuestion('initMethod', 'Select a method', 'list', methods);
 }
 
 // Returns an inquirer question with a list of arguments for a particular method
@@ -103,13 +137,14 @@ export function argsList(contractFullName: string, methodIdentifier: string): Ge
   if (method) {
     return method
       .inputs
-      .map(({ name: inputName, type }) => genericInquirerQuestion(inputName, `${inputName}:`, 'input'))
+      .map(({ name: inputName }) => genericInquirerQuestion(inputName, `${inputName}:`, 'input'))
       .reduce((accum, current) => ({ ...accum, ...current }), {});
   } else return {};
 }
 
 // Returns an object with each key as an argument name and each value as undefined
 // (e.g., { foo: undefined, bar: undefined }) as required by the promptIfNeeded function
+// TODO: change name
 export function initArgsForPrompt(contractFullName: string, methodIdentifier: string): GenericObject {
   const method = contractMethods(contractFullName)
     .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
@@ -121,7 +156,7 @@ export function initArgsForPrompt(contractFullName: string, methodIdentifier: st
   } else return {};
 }
 
-function contractMethods(contractFullName: string): any {
+export function contractMethods(contractFullName: string): any {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const localController = new LocalController();
   const contract = localController.getContractClass(packageName, contractAlias);
@@ -129,7 +164,7 @@ function contractMethods(contractFullName: string): any {
   return contract.methodsFromAst();
 }
 
-function genericInquirerQuestion(name: string, message: string, type: string, choices?: Choices) {
+function genericInquirerQuestion(name: string, message: string, type: string, choices?: any) {
   return { [name]: { type, message, choices } };
 }
 
@@ -143,7 +178,7 @@ function promptFor(name: string, defaults: {}, props: {}): GenericObject {
 }
 
 function hasEmptyChoices({ choices }): boolean {
-  return choices && isEmpty(choices);
+  return choices && isEmpty(choices) && typeof choices !== 'function';
 }
 
 async function answersFor(questions: GenericObject): Promise<GenericObject> {

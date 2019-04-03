@@ -37,12 +37,13 @@ export function parseArgs(args: string): string[] | never {
   }
 }
 
+//export function parseInit(options: any, defaultInit: string = 'initialize', contractMethods: any): { initMethod: string, initArgs: string[] } {
 export function parseInit(options: any, defaultInit: string = 'initialize'): { initMethod: string, initArgs: string[] } {
-  let initMethod = options.init;
-  if (typeof initMethod === 'boolean') initMethod = defaultInit;
-  if (!initMethod && typeof options.args !== 'undefined') initMethod = defaultInit;
+  let { init: initMethod, args: initArgs } = options;
 
-  let initArgs = options.args;
+  if (typeof initMethod === 'boolean') initMethod = defaultInit;
+  if (!initMethod && typeof initArgs !== 'undefined') initMethod = defaultInit;
+
   if(typeof initArgs === 'string') initArgs = parseArgs(initArgs);
   else if(typeof initArgs === 'boolean' || initMethod) initArgs = [];
 

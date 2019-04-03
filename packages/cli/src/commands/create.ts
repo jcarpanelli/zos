@@ -6,7 +6,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, contractsList, methodsList, argsList, initArgsForPrompt } from '../utils/prompt';
+import { promptIfNeeded, networksList, contractsList, methodsList, argsList, initArgsForPrompt, contractMethods } from '../utils/prompt';
 
 const name: string = 'create';
 const signature: string = `${name} [alias]`;
@@ -18,10 +18,20 @@ const baseProps = {
 };
 
 const initProps = (contractFullName?: string, initMethod?: string) => {
-  const args = initMethod ? argsList(contractFullName, initMethod) : {};
+  const initArgs = initMethod ? argsList(contractFullName, initMethod) : {};
+
   return {
-    ...methodsList(contractFullName),
-    ...args
+    askForInitParams: {
+      type: 'confirm',
+      message: 'Do you want to run a function after creating the instance?'
+    },
+    initMethod: {
+      type: 'list',
+      message: 'Select a method',
+      choices: methodsList(contractFullName),
+      when: (({ askForInitParams }) => askForInitParams)
+    },
+    ...initArgs
   };
 };
 
@@ -38,10 +48,10 @@ const register: (program: any) => any = (program) => program
 async function action(contractFullName: string, options: any): Promise<void> {
   const { force } = options;
   const createParams = await promptForCreate(contractFullName, options);
-  if (!await hasToMigrateProject(createParams.network)) process.exit(0);
 
   // get network and prompt for initialize method and arguments
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...createParams });
+  if (!await hasToMigrateProject(network)) process.exit(0);
   const initParams = await promptForInitParams(createParams.contractFullName, options);
   const { contract: contractAlias, package: packageName } = fromContractFullName(createParams.contractFullName);
   const args = pickBy({ packageName, contractAlias, ...initParams, force });
@@ -55,24 +65,28 @@ async function promptForCreate(contractFullName: string, options: any): Promise<
   const { force, network: networkInOpts } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaultOpts = { network: networkInSession };
+  const args = { contractFullName };
   const opts = { network: networkInOpts || !expired ? networkInSession : undefined };
 
-  return promptIfNeeded({ args: { contractFullName }, opts, defaults: defaultOpts, props: baseProps });
+  return promptIfNeeded({ args, opts, defaults: defaultOpts, props: baseProps });
 }
 
+// TODO: see if I can unify both prompts
 async function promptForInitParams(contractFullName: string, options: any) {
   const initMethodProps = initProps(contractFullName);
   const initParams = parseInit(options, 'initialize');
+  const { init: rawInitMethod } = options;
   const { initMethod } = initParams;
+  const opts = { askForInitParams: rawInitMethod || undefined, initMethod };
   let { initArgs } = initParams;
 
   // prompt for init method
-  let { initMethod: promptedMethod } = await promptIfNeeded({ opts: { initMethod }, props: initMethodProps });
+  let { initMethod: promptedMethod } = await promptIfNeeded({ opts, props: initMethodProps });
   // if promptedMethod is a string, set an object
-  if (typeof promptedMethod === 'string') promptedMethod = { name: promptedMethod, selector: promptedMethod };
+  if (typeof promptedMethod === 'string' || !promptedMethod) promptedMethod = { name: promptedMethod, selector: promptedMethod };
 
   // if no initial arguments are provided, prompt for them
-  if (!initArgs) {
+  if (!initArgs || initArgs.length === 0) {
     const initArgsKeys = initArgsForPrompt(contractFullName, promptedMethod.selector);
     const initArgsProps = initProps(contractFullName, promptedMethod.selector);
     const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps });
