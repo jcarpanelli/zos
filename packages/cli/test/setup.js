@@ -1,10 +1,11 @@
 process.env.NODE_ENV = 'test'
 
-import { ZWeb3, Contracts } from 'zos-lib'
+import { ZWeb3, Contracts, Logger } from 'zos-lib'
 import Dependency from '../src/models/dependency/Dependency'
 import ZosPackageFile from '../src/models/files/ZosPackageFile'
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile'
 
+silentLogs()
 useTestZosPackageFile()
 doNotInstallStdlib()
 ZWeb3.initialize(web3.currentProvider)
@@ -28,7 +29,6 @@ function doNotInstallStdlib() {
 }
 
 function setArtifactDefaults() {
-
   const DEFAULT_TESTING_TX_PARAMS = {
     gas: 6721975,
     gasPrice: 100000000000
@@ -41,4 +41,8 @@ function setArtifactDefaults() {
 
   const defaults = process.env.SOLIDITY_COVERAGE ? DEFAULT_COVERAGE_TX_PARAMS : DEFAULT_TESTING_TX_PARAMS
   Contracts.setArtifactsDefaults(defaults)
+}
+
+function silentLogs() {
+  Logger.silent(true);
 }

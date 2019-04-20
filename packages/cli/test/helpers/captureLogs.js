@@ -3,12 +3,12 @@ import { Logger } from 'zos-lib';
 export default class CaptureLogs {
   constructor() {
     this.clear()
-    this.originalInfo = Logger.prototype.info
-    this.originalWarn = Logger.prototype.warn
-    this.originalError = Logger.prototype.error
-    Logger.prototype.info = msg => this.infos.push(msg)
-    Logger.prototype.warn = msg => this.warns.push(msg)
-    Logger.prototype.error = (msg, ex) => this.errors.push(ex ? `${msg} ${ex.message}` : msg)
+    this.originalInfo = Logger.info
+    this.originalWarn = Logger.warn
+    this.originalError = Logger.error
+    Logger.info = msg => this.infos.push(msg)
+    Logger.warn = msg => this.warns.push(msg)
+    Logger.error = (msg, ex) => this.errors.push(ex ? `${msg} ${ex.message}` : msg)
   }
 
   get text() {
@@ -26,9 +26,9 @@ export default class CaptureLogs {
   }
 
   restore() {
-    Logger.prototype.info = this.originalInfo
-    Logger.prototype.warn = this.originalWarn
-    Logger.prototype.error = this.originalError
+    Logger.info = this.originalInfo
+    Logger.warn = this.originalWarn
+    Logger.error = this.originalError
   }
 
   match(re) {

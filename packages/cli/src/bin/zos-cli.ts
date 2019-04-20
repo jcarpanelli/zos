@@ -24,7 +24,7 @@ try {
   process.exit(1);
 }
 
-Logger.initialize({ silent: false, verbose: false })
+Logger.silent(false);
 
 program.parse(process.argv);
 if (program.args.length === 0) program.help();
