@@ -6,7 +6,7 @@ import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('PackageProject');
+Logger.register('PackageProject');
 
 export default abstract class BasePackageProject {
 
@@ -30,30 +30,30 @@ export default abstract class BasePackageProject {
   // TODO: Testme
   public async freeze(): Promise<void> {
     const version: string = await this.getCurrentVersion();
-    log.info(`Freezing version ${version}...`);
+    Logger.info(`Freezing version ${version}...`);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.freeze();
-    log.info(`Version ${version} has been frozen`);
+    Logger.info(`Version ${version} has been frozen`);
   }
 
   public async setImplementation(contract: Contract, contractName: string): Promise<Contract> {
     if (!contractName) contractName = contract.schema.contractName;
-    log.info(`Setting implementation of ${contractName} in directory...`);
+    Logger.info(`Setting implementation of ${contractName} in directory...`);
     const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
-    log.info(`Implementation set: ${implementation.address}`);
+    Logger.info(`Implementation set: ${implementation.address}`);
     return implementation;
   }
 
   public async unsetImplementation(contractName: string): Promise<void> {
-    log.info(`Unsetting implementation of ${contractName}...`);
+    Logger.info(`Unsetting implementation of ${contractName}...`);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.unsetImplementation(contractName);
   }
 
   public async registerImplementation(contractName: string, { address }: { address: string }): Promise<void> {
-    log.info(`Registering implementation of ${contractName} at ${address} in directory...`);
+    Logger.info(`Registering implementation of ${contractName} at ${address} in directory...`);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, address);
   }

@@ -7,7 +7,7 @@ import BaseSimpleProject from './BaseSimpleProject';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('SimpleProject');
+Logger.register('SimpleProject');
 
 export default class SimpleProject  extends BaseSimpleProject {
   constructor(name: string = 'main', proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
@@ -18,14 +18,14 @@ export default class SimpleProject  extends BaseSimpleProject {
     const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     const proxy = Proxy.at(pAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
-    log.info(`Instance at ${proxyAddress} upgraded`);
+    Logger.info(`Instance at ${proxyAddress} upgraded`);
     return contract.at(proxyAddress);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<Proxy> {
     const proxy: Proxy = Proxy.at(proxyAddress, this.txParams);
     await proxy.changeAdmin(newAdmin);
-    log.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`);
+    Logger.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`);
     return proxy;
   }
 

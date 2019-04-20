@@ -8,7 +8,7 @@ import ProxyFactory from '../proxy/ProxyFactory';
 import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('ProxyAdminProject');
+Logger.register('ProxyAdminProject');
 
 class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
@@ -38,7 +38,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     const { initMethod: initMethodName, initArgs } = contractParams;
     const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contract, initMethodName, initArgs);
-    log.info(`Instance at ${pAddress} upgraded`);
+    Logger.info(`Instance at ${pAddress} upgraded`);
     return contract.at(pAddress);
   }
 

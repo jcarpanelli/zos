@@ -22,7 +22,7 @@ import TruffleProjectInitializer from '../initializer/truffle/TruffleProjectInit
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
-const log = new Logger('LocalController');
+Logger.register('LocalController');
 
 const DEFAULT_VERSION = '0.1.0';
 
@@ -62,7 +62,7 @@ export default class LocalController {
   }
 
   public add(contractAlias: string, contractName: string): void {
-    log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`);
+    Logger.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`);
     this.packageFile.addContract(contractAlias, contractName);
   }
 
@@ -88,9 +88,9 @@ export default class LocalController {
 
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
-      log.error(`Contract ${contractAlias} to be removed was not found`);
+      Logger.error(`Contract ${contractAlias} to be removed was not found`);
     } else {
-      log.info(`Removing ${contractAlias}`);
+      Logger.info(`Removing ${contractAlias}`);
       this.packageFile.unsetContract(contractAlias);
     }
   }
@@ -157,7 +157,7 @@ export default class LocalController {
 
     if (linkedDependencies.length > 0) {
       const label = linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(`${label} ${linkedDependencies.join(', ')} successfully linked`);
+      Logger.info(`${label} ${linkedDependencies.join(', ')} successfully linked`);
     }
   }
 
@@ -171,7 +171,7 @@ export default class LocalController {
 
     if (unlinkedDependencies.length > 0) {
       const label = unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(`${label} ${unlinkedDependencies.join(', ')} successfully unlinked`);
+      Logger.info(`${label} ${unlinkedDependencies.join(', ')} successfully unlinked`);
     }
   }
 

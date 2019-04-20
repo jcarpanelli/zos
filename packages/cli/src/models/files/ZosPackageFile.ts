@@ -5,7 +5,7 @@ import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
-const log = new Logger('ZosPackageFile');
+Logger.register('ZosPackageFile');
 
 export default class ZosPackageFile {
 
@@ -159,7 +159,7 @@ export default class ZosPackageFile {
     if(this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      exists ? log.info(`Updated ${this.fileName}`) : log.info(`Created ${this.fileName}`);
+      exists ? Logger.info(`Updated ${this.fileName}`) : Logger.info(`Created ${this.fileName}`);
     }
   }
 

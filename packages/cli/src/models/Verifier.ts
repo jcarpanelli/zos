@@ -4,7 +4,7 @@ import querystring from 'querystring';
 
 import { sleep, Logger } from 'zos-lib';
 
-const log: Logger = new Logger('Verifier');
+Logger.register('Verifier');
 
 // Max number of API request retries on error
 const RETRY_COUNT: number = 3;
@@ -59,7 +59,7 @@ async function publishToEtherchain(params: VerifierOptions): Promise<void | neve
       const html = cheerio.load(response.data);
       const message = html('#infoModal .modal-body').text();
       if (message.match(/successful/)) {
-        log.info(`Contract verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`);
+        Logger.info(`Contract verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`);
       } else if(message.match(/^No[\w\s]*provided\.$/)) {
         throw new Error(`Error during contract verification: ${message}`);
       } else {
@@ -102,9 +102,9 @@ async function publishToEtherscan(params: VerifierOptions): Promise<void | never
     });
 
     if (response.status === 200 && response.data.status === '1') {
-      log.info('Contract verification in process (this usually takes under 30 seconds)...');
+      Logger.info('Contract verification in process (this usually takes under 30 seconds)...');
       await checkEtherscanVerificationStatus(response.data.result, etherscanApiUrl, RETRY_COUNT);
-      log.info(`Contract verified successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`);
+      Logger.info(`Contract verified successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`);
     } else {
       throw new Error(`Error while trying to verify contract: ${response.data.result}`);
     }

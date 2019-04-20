@@ -9,7 +9,7 @@ import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('ProxyAdmin');
+Logger.register('ProxyAdmin');
 
 export default class ProxyAdmin {
   public contract: Contract;
@@ -22,9 +22,9 @@ export default class ProxyAdmin {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyAdmin> {
-    log.info('Deploying new ProxyAdmin...');
+    Logger.info('Deploying new ProxyAdmin...');
     const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyAdmin'), [], txParams);
-    log.info(`Deployed ProxyAdmin at ${contract.address}`);
+    Logger.info(`Deployed ProxyAdmin at ${contract.address}`);
     return new this(contract, txParams);
   }
 
@@ -39,9 +39,9 @@ export default class ProxyAdmin {
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
+    Logger.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
     await Transactions.sendTransaction(this.contract.methods.changeProxyAdmin, [proxyAddress, newAdmin], { ...this.txParams });
-    log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
+    Logger.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
   public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: Contract, initMethodName: string, initArgs: any): Promise<Contract> {
@@ -49,15 +49,19 @@ export default class ProxyAdmin {
     const receipt: any = initMethodName === undefined
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
       : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);
-    log.info(`TX receipt received: ${receipt.transactionHash}`);
+    Logger.info(`TX receipt received: ${receipt.transactionHash}`);
     return contract.at(proxyAddress);
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
+<<<<<<< HEAD
     await this.checkOwner();
     log.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
+=======
+    Logger.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
+>>>>>>> Transform Logger class into an object
     await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
-    log.info(`Owner for proxy admin set to ${newAdminOwner}`);
+    Logger.info(`Owner for proxy admin set to ${newAdminOwner}`);
   }
 
   public async getOwner(): Promise<string> {
@@ -73,13 +77,13 @@ export default class ProxyAdmin {
   }
 
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {
-    log.info(`Upgrading proxy at ${proxyAddress} without running migrations...`);
+    Logger.info(`Upgrading proxy at ${proxyAddress} without running migrations...`);
     return Transactions.sendTransaction(this.contract.methods.upgrade, [proxyAddress, implementation], { ...this.txParams });
   }
 
   private async _upgradeProxyAndCall(proxyAddress: string, implementationAddress: string, contract: any, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-    log.info(`Upgrading proxy at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}...`);
+    Logger.info(`Upgrading proxy at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}...`);
     return Transactions.sendTransaction(this.contract.methods.upgradeAndCall, [proxyAddress, implementationAddress, callData], { ...this.txParams });
   }
 

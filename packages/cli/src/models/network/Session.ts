@@ -4,7 +4,7 @@ import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import { FileSystem as fs, Logger } from 'zos-lib';
 
-const log: Logger = new Logger('Session');
+Logger.register('Session');
 
 const ZOS_SESSION_PATH: string = '.zos.session';
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
@@ -24,7 +24,7 @@ const Session = {
     if (!session || this._hasExpired(session)) return this._setDefaults(overrides);
     if (!silent) {
       const fields = omitBy(session, (v, key) => overrides[key] && overrides[key] !== v);
-      log.info(`Using session with ${describe(fields)}`);
+      Logger.info(`Using session with ${describe(fields)}`);
     }
 
     return { ...session, ...overrides };
@@ -44,12 +44,12 @@ const Session = {
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo: boolean = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
     fs.writeJson(ZOS_SESSION_PATH, { network, from, timeout, expires: expirationTimestamp });
-    if (logInfo) log.info(`Using ${describe({ network, from, timeout })} by default.`);
+    if (logInfo) Logger.info(`Using ${describe({ network, from, timeout })} by default.`);
   },
 
   close(): void {
     if (fs.exists(ZOS_SESSION_PATH)) fs.remove(ZOS_SESSION_PATH);
-    log.info(`Closed zos session.`);
+    Logger.info(`Closed zos session.`);
   },
 
   ignoreFile(): void {

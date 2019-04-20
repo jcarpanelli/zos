@@ -11,7 +11,7 @@ import { TxParams, FileSystem as fs, PackageProject, Contracts, Contract, getSol
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
-const log = new Logger('Dependency');
+Logger.register('Dependency');
 
 export default class Dependency {
 
@@ -58,7 +58,7 @@ export default class Dependency {
   }
 
   public static async install(nameAndVersion: string): Promise<Dependency> {
-    log.info(`Installing ${nameAndVersion} via npm...`);
+    Logger.info(`Installing ${nameAndVersion} via npm...`);
     await npm.install([nameAndVersion], { save: true, cwd: process.cwd() });
     return this.fromNameWithVersion(nameAndVersion);
   }

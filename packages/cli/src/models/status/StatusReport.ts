@@ -12,7 +12,7 @@ export default class StatusReport {
     this.description = description;
   }
 
-  public log(logger: Logger): void {
+  public log(logger): void {
     logger.error(this.description);
     logger.error(` - local: ${this.expected}`);
     logger.warn(` - on-chain:   ${this.observed}\n`);

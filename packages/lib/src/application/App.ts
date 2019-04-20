@@ -13,7 +13,7 @@ import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import Transactions from '../utils/Transactions';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('App');
+Logger.register('App');
 
 export default class App {
   public appContract: any;
@@ -25,9 +25,9 @@ export default class App {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<App> {
-    log.info('Deploying new App...');
+    Logger.info('Deploying new App...');
     const appContract = await Transactions.deployContract(this.getContractClass(), [], txParams);
-    log.info(`Deployed App at ${appContract.address}`);
+    Logger.info(`Deployed App at ${appContract.address}`);
     return new this(appContract, txParams);
   }
 
@@ -93,12 +93,12 @@ export default class App {
     const proxy = initMethodName === undefined
       ? await this._createProxy(packageName, contractName, proxyAdmin)
       : await this._createProxyAndCall(contract, packageName, contractName, proxyAdmin, initMethodName, initArgs);
-    log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
+    Logger.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
   private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<Proxy> {
-    log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
+    Logger.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
     const initializeData: Buffer = Buffer.from('');
     const implementation = await this.getImplementation(packageName, contractName);
     return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
@@ -106,16 +106,16 @@ export default class App {
 
   private async _createProxyAndCall(contract: Contract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<Proxy> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-    log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
+    Logger.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
     const implementation = await this.getImplementation(packageName, contractName);
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }
 
   private async _copyContract(packageName: string, contractName: string, contract: Contract): Promise<Contract> {
-    log.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
+    Logger.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
     const implementation = await this.getImplementation(packageName, contractName);
     const instance = await copyContract(contract, implementation, { ...this.txParams });
-    log.info(`${packageName} ${contractName} instance created at ${instance.address}`);
+    Logger.info(`${packageName} ${contractName} instance created at ${instance.address}`);
     return instance;
   }
 
@@ -123,7 +123,7 @@ export default class App {
     if (typeof(initArgs) !== 'undefined') {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-      log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
+      Logger.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
       await Transactions.sendDataTransaction(instance, Object.assign({}, { ...this.txParams }, { data: callData }));
     }
   }

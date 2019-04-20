@@ -56,7 +56,8 @@ import ZosPackageFile from '../files/ZosPackageFile';
 import { ZOS_VERSION } from '../files/ZosVersion';
 import { ProxyType } from '../../scripts/interfaces';
 
-const log = new Logger('NetworkController');
+Logger.register('NetworkController');
+
 type Project = ProxyAdminProject | AppProject;
 type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
@@ -187,8 +188,8 @@ export default class NetworkController {
   // DeployerController
   private _checkVersion(): void {
     if (this._newVersionRequired()) {
-      log.info(`Current version ${this.currentVersion}`);
-      log.info(`Creating new version ${this.packageVersion}`);
+      Logger.info(`Current version ${this.currentVersion}`);
+      Logger.info(`Creating new version ${this.packageVersion}`);
       this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
@@ -240,7 +241,7 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
-    log.info(`Uploading ${libName} library...`);
+    Logger.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
   }
@@ -258,7 +259,7 @@ export default class NetworkController {
   public async uploadContract(contractAlias: string, contract: Contract): Promise<void | never> {
     try {
       await this._setSolidityLibs(contract);
-      log.info(`Uploading ${contract.schema.contractName} contract as ${contractAlias}`);
+      Logger.info(`Uploading ${contract.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contract, contractAlias);
       const { types, storage } = contract.schema.storageInfo || { types: null, storage: null };
       this.networkFile.addContract(contractAlias, contractInstance, {
@@ -289,7 +290,7 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
-      log.info(`Removing ${libName} library`);
+      Logger.info(`Removing ${libName} library`);
       await this.project.unsetImplementation(libName);
       this.networkFile.unsetSolidityLib(libName);
     } catch(error) {
@@ -324,7 +325,7 @@ export default class NetworkController {
   // Contract model
   public async unsetContract(contractAlias: string): Promise<void | never> {
     try {
-      log.info(`Removing ${contractAlias} contract`);
+      Logger.info(`Removing ${contractAlias} contract`);
       await this.project.unsetImplementation(contractAlias);
       this.networkFile.unsetContract(contractAlias);
     } catch(error) {
@@ -342,7 +343,7 @@ export default class NetworkController {
 
   // DeployerController || Contract model
   public validateContract(contractAlias: string, contract: Contract, buildArtifacts: BuildArtifacts): boolean {
-    log.info(`Validating contract ${contract.schema.contractName}`);
+    Logger.info(`Validating contract ${contract.schema.contractName}`);
     try {
       const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
       const warnings = validate(contract, existingContractInfo, buildArtifacts);
@@ -355,7 +356,7 @@ export default class NetworkController {
       contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
       return validationPasses(newWarnings);
     } catch (err) {
-      log.error(`Error while validating contract ${contract.schema.contractName}:`, err);
+      Logger.error(`Error while validating contract ${contract.schema.contractName}`, err);
       return false;
     }
   }
@@ -408,7 +409,7 @@ export default class NetworkController {
     if (throwIfFail) {
       throw Error(msg);
     } else {
-      log.info(msg);
+      Logger.info(msg);
     }
   }
 
@@ -450,7 +451,7 @@ export default class NetworkController {
     const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias);
     const contractSource = await flattenSourceCode([sourcePath]);
     const contractAddress = this.networkFile.contracts[contractAlias].address;
-    log.info(`Verifying and publishing ${contractAlias} on ${remote}`);
+    Logger.info(`Verifying and publishing ${contractAlias} on ${remote}`);
 
     await Verifier.verifyAndPublish(remote, { contractName, compilerVersion, optimizer, optimizerRuns, contractSource, contractAddress, apiKey, network: this.network });
   }
@@ -500,7 +501,7 @@ export default class NetworkController {
         ? await ProxyAdmin.fetch(this.proxyAdminAddress, this.txParams)
         : await ProxyAdmin.deploy(this.txParams);
       if (!this.proxyAdminAddress) {
-        log.info(`Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`);
+        Logger.info(`Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`);
         await Transactions.awaitConfirmations(proxyAdmin.contract.deployment.transactionHash);
       }
       this._tryRegisterProxyAdmin(proxyAdmin.address);
@@ -516,9 +517,9 @@ export default class NetworkController {
           }
         }
       }));
-      log.info(`Successfully migrated to zosversion ${ZOS_VERSION}`);
+      Logger.info(`Successfully migrated to zosversion ${ZOS_VERSION}`);
     } else {
-      log.info(`No proxies were found. Updating zosversion to ${ZOS_VERSION}`);
+      Logger.info(`No proxies were found. Updating zosversion to ${ZOS_VERSION}`);
     }
   }
 
@@ -530,16 +531,16 @@ export default class NetworkController {
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
-      log.info(`Project is already published to ${this.network}`);
+      Logger.info(`Project is already published to ${this.network}`);
       return;
     }
 
     await this._migrateZosversionIfNeeded();
-    log.info(`Publishing project to ${this.network}...`);
+    Logger.info(`Publishing project to ${this.network}...`);
     const proxyAdminProject = <ProxyAdminProject>(await this.fetchOrDeploy(this.currentVersion));
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
-    log.info(`Publish to ${this.network} successful`);
+    Logger.info(`Publish to ${this.network} successful`);
   }
 
   // Proxy model
@@ -653,7 +654,7 @@ export default class NetworkController {
       .map(({ name }) => name);
 
     if (initializerMethods.length === 0) return;
-    log.error(`Possible initialization method (${uniq(initializerMethods).join(', ')}) found in contract. Make sure you initialize your instance.`);
+    Logger.error(`Possible initialization method (${uniq(initializerMethods).join(', ')}) found in contract. Make sure you initialize your instance.`);
   }
 
   // Proxy model
@@ -732,7 +733,7 @@ export default class NetworkController {
         await this.project.upgradeProxy(proxy.address, contract, { initMethod, initArgs, ... name });
         newImplementation = contractImplementation;
       } else {
-        log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`);
+        Logger.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`);
         newImplementation = currentImplementation;
       }
 
@@ -761,7 +762,7 @@ export default class NetworkController {
     });
 
     if (isEmpty(proxies)) {
-      log.info(`No contract instances that match${criteriaDescription} were found`);
+      Logger.info(`No contract instances that match${criteriaDescription} were found`);
       return [];
     }
 
@@ -769,7 +770,7 @@ export default class NetworkController {
     const ownedProxies = proxies.filter((proxy) => !proxy.admin || !expectedOwner || ZWeb3.toChecksumAddress(proxy.admin) === expectedOwner);
 
     if (isEmpty(ownedProxies)) {
-      log.info(`No contract instances that match${criteriaDescription} are owned by this project`);
+      Logger.info(`No contract instances that match${criteriaDescription} are owned by this project`);
     }
 
     return ownedProxies;
@@ -787,7 +788,7 @@ export default class NetworkController {
     try {
       const dependency = new Dependency(depName, depVersion);
       if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return;
-      log.info(`Deploying ${depName} contracts`);
+      Logger.info(`Deploying ${depName} contracts`);
       const deployment = await dependency.deploy(this.txParams);
       this.networkFile.setDependency(depName, {
         package: (await deployment.getProjectPackage()).address,
@@ -812,7 +813,7 @@ export default class NetworkController {
   public async unlinkDependency(depName: string): Promise<void | never> {
     try {
       if (await this.project.hasDependency(depName)) {
-        log.info(`Unlinking dependency ${depName}`);
+        Logger.info(`Unlinking dependency ${depName}`);
         await this.project.unsetDependency(depName);
       }
       this.networkFile.unsetDependency(depName);
@@ -825,7 +826,7 @@ export default class NetworkController {
   public async linkDependency(depName: string, depVersion: string): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-        log.info(`Using custom deployment of ${depName}`);
+        Logger.info(`Using custom deployment of ${depName}`);
         const depInfo = this.networkFile.getDependency(depName);
         return await this.project.setDependency(depName, depInfo.package, depInfo.version);
       }
@@ -833,7 +834,7 @@ export default class NetworkController {
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
         const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network);
         if (!dependencyInfo.packageAddress) throw Error(`Dependency '${depName}' has not been published to network '${this.network}', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`);
-        log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
+        Logger.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
         await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version);
         const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version };
         this.networkFile.setDependency(depName, depInfo);

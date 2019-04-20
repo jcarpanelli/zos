@@ -7,7 +7,7 @@ import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
 import Transactions from '../utils/Transactions';
 
-const log: Logger = new Logger('Package');
+Logger.register('Package');
 
 export default class Package {
   private packageContract: Contract;
@@ -21,10 +21,10 @@ export default class Package {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<Package> {
-    log.info('Deploying new Package...');
+    Logger.info('Deploying new Package...');
     const PackageContract: Contract = Contracts.getFromLib('Package');
     const packageContract = await Transactions.deployContract(PackageContract, [], txParams);
-    log.info(`Deployed Package ${packageContract.address}`);
+    Logger.info(`Deployed Package ${packageContract.address}`);
     return new this(packageContract, txParams);
   }
 
@@ -62,11 +62,11 @@ export default class Package {
   }
 
   public async newVersion(version: string, content: string = ''): Promise<ImplementationDirectory> {
-    log.info('Adding new version...');
+    Logger.info('Adding new version...');
     const semver: SemanticVersion = toSemanticVersion(version);
     const directory: ImplementationDirectory = await ImplementationDirectory.deploy({ ...this.txParams });
     await Transactions.sendTransaction(this.packageContract.methods.addVersion, [semver, directory.address, Buffer.from(content)], { ...this.txParams });
-    log.info(`Added version ${semver.join('.')}`);
+    Logger.info(`Added version ${semver.join('.')}`);
     return directory;
   }
 

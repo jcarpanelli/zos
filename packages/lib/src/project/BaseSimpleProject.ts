@@ -13,7 +13,7 @@ import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('BaseSimpleProject');
+Logger.register('BaseSimpleProject');
 
 interface Implementations {
   [contractName: string]: Implementation;
@@ -51,7 +51,7 @@ export default abstract class BaseSimpleProject {
   public abstract async getAdminAddress(): Promise<string>;
 
   public async setImplementation(contract: Contract, contractName?: string): Promise<any> {
-    log.info(`Deploying logic contract for ${contract.schema.contractName}`);
+    Logger.info(`Deploying logic contract for ${contract.schema.contractName}`);
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     await this.registerImplementation(contractName, {
@@ -105,7 +105,7 @@ export default abstract class BaseSimpleProject {
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
     const proxyAdmin = admin || (await this.getAdminAddress());
     const proxy = await Proxy.deploy(implementationAddress, proxyAdmin, initCallData, this.txParams);
-    log.info(`Instance created at ${proxy.address}`);
+    Logger.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -118,7 +118,7 @@ export default abstract class BaseSimpleProject {
     const adminAddress = admin || await this.getAdminAddress();
     const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData, signature);
 
-    log.info(`Instance created at ${proxy.address}`);
+    Logger.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -193,10 +193,10 @@ export default abstract class BaseSimpleProject {
   protected _getAndLogInitCallData(contract: Contract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
+      if (actionLabel) Logger.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
       return callData;
     } else {
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
+      if (actionLabel) Logger.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
       return null;
     }
   }

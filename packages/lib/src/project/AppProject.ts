@@ -21,7 +21,7 @@ import Logger from '../utils/Logger';
 const DEFAULT_NAME: string = 'main';
 const DEFAULT_VERSION: string = '0.1.0';
 
-const log: Logger = new Logger('AppProject');
+Logger.register('AppProject');
 
 export interface ContractInterface {
   packageName?: string;
@@ -208,7 +208,7 @@ class BaseAppProject extends BasePackageProject {
     const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
     const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin, initCallData, signature);
 
-    log.info(`Instance created at ${proxy.address}`);
+    Logger.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -272,10 +272,10 @@ class BaseAppProject extends BasePackageProject {
   protected getInitCallData(contract: Contract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
+      if (actionLabel) Logger.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
       return callData;
     } else {
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
+      if (actionLabel) Logger.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
       return null;
     }
   }

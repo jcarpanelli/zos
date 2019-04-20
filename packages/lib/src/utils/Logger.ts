@@ -5,56 +5,53 @@ interface LoggerOptions {
   silent: boolean;
 }
 
-export default class Logger {
+const Logger = {
 
-  private _prefix: string;
-  private _opts: LoggerOptions;
+  initialize(defaults) {
+    this.defaults = defaults || { verbose: false, silent: true };
+  },
 
-  private static _defaults: LoggerOptions = {
-    verbose: false,
-    silent: true
-  };
+  register(prefix: string, opts?: LoggerOptions) {
+    this._opts =  opts ? opts : { verbose: false, silent: false };
+  },
 
-  public static silent(value): void {
-    Logger._defaults.silent = value;
-  }
+  silent(value): void {
+    this.defaults.silent = value;
+  },
 
-  public static verbose(value): void {
-    Logger._defaults.verbose = value;
-  }
+  verbose(value): void {
+    this.defaults.verbose = value;
+  },
 
-  constructor(prefix: string, opts?: LoggerOptions) {
-    this._prefix = prefix;
-    this._opts = opts;
-  }
-
-  public info(msg: string): void {
+  info(msg: string): void {
     this.log(msg, 'green');
-  }
+  },
 
-  public warn(msg: string) {
+  warn(msg: string) {
     this.log(msg, 'yellow');
-  }
+  },
 
-  public error(msg: string, ex?: Error): void {
-    if (ex && ex.message && !this.opts.verbose) {
+  error(msg: string, ex?: Error): void {
+    if (ex && ex.message && !this._opts.verbose) {
       this.log(`${msg}: ${ex.message}`, 'red');
     } else {
       this.log(msg, 'red');
     }
 
-    if (ex && this.opts.verbose) {
+    if (ex && this._opts.verbose) {
       this.error(ex.stack);
     }
-  }
+  },
 
-  public log(msg: string, color: string = ''): void {
-    if (this.opts.silent) return;
-    if (this.opts.verbose) msg = `[${this._prefix}] ${msg}`;
+  log(msg: string, color: string = ''): void {
+    if (this._opts.silent) return;
+    if (this._opts.verbose) msg = `[${this._prefix}] ${msg}`;
     console.error(chalk.keyword(color)(msg));
-  }
+  },
 
-  get opts(): LoggerOptions {
-    return {...this._opts, ...Logger._defaults};
+  opts(): LoggerOptions {
+    return {...this._opts, ...this.defaults};
   }
-}
+};
+
+export default Logger;

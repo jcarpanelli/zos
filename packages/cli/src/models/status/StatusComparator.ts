@@ -1,7 +1,7 @@
 import { Logger } from 'zos-lib';
 import StatusReport from './StatusReport';
 
-const log = new Logger('StatusComparator');
+Logger.register('StatusComparator');
 
 export interface ComparedObject {
   name?: string;
@@ -23,8 +23,8 @@ export default class StatusComparator {
   }
 
   public onEndChecking(): void {
-    this.reports.forEach((report) => report.log(log));
-    if(this.reports.length === 0) log.info('Your project is up to date.');
+    // this.reports.forEach((report) => report.log(log));
+    if(this.reports.length === 0) Logger.info('Your project is up to date.');
   }
 
   public onMismatchingVersion(expected: string, observed: string): void {

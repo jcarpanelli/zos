@@ -17,7 +17,7 @@ import ZosNetworkFile, {
 } from '../files/ZosNetworkFile';
 import { ComparedObject } from './StatusComparator';
 
-const log = new Logger('StatusChecker');
+Logger.register('StatusChecker');
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export default class StatusChecker {
@@ -63,7 +63,7 @@ export default class StatusChecker {
 
   public async call(): Promise<void> {
     await this.setProject();
-    log.info(`Comparing status of project ${(await this.project.getProjectPackage()).address} ...\n`);
+    Logger.info(`Comparing status of project ${(await this.project.getProjectPackage()).address} ...\n`);
     await this.checkApp();
     this.visitor.onEndChecking();
   }

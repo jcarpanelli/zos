@@ -16,7 +16,7 @@ const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potential
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
 const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
-const log = new Logger('Validations');
+Logger.register('Validations');
 
 export default class ValidationLogger {
 
@@ -54,31 +54,31 @@ export default class ValidationLogger {
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
     if (hasSelfDestruct) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
+      Logger.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
     }
   }
 
   public logHasDelegateCall(hasDelegateCall: boolean): void {
     if (hasDelegateCall) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
+      Logger.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
     }
   }
 
   public logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations: boolean): void {
     if (hasInitialValuesInDeclarations) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`);
+      Logger.warn(`- Contract ${this.contractName} or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`);
     }
   }
 
   public logHasConstructor(hasConstructor: boolean): void {
     if (hasConstructor) {
-      log.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`);
+      Logger.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`);
     }
   }
 
   public logUninitializedBaseContracts(uninitializedBaseContracts: any): void {
     if (!isEmpty(uninitializedBaseContracts)) {
-      log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. See ${INITIALIZERS_LINK}.`);
+      Logger.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. See ${INITIALIZERS_LINK}.`);
     }
   }
 
@@ -88,7 +88,7 @@ export default class ValidationLogger {
     const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
     const containsString = `contain${vars.length === 1 ? 's' : ''}`;
-    log.warn(`- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. ` +
+    Logger.warn(`- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. ` +
              `See ${STORAGE_CHECKS_LINK} for more info.`);
   }
 
@@ -109,40 +109,40 @@ export default class ValidationLogger {
 
       switch (action) {
         case 'insert':
-          log.error(`- New variable '${updatedVarDescription}' was inserted in contract ${updated.contract} in ${updatedVarSource}. ` +
+          Logger.error(`- New variable '${updatedVarDescription}' was inserted in contract ${updated.contract} in ${updatedVarSource}. ` +
                     `You should only add new variables at the end of your contract.`);
 
           break;
         case 'delete':
-          log.error(`- Variable '${originalVarDescription}' was removed from contract ${original.contract}. `+
+          Logger.error(`- Variable '${originalVarDescription}' was removed from contract ${original.contract}. `+
                     `You should avoid deleting variables from your contracts.`);
           break;
         case 'append':
-          log.info(`- New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource} `+
+          Logger.info(`- New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource} `+
                    `at the end of the contract.`);
           break;
         case 'pop':
-          log.warn(`- Variable '${originalVarDescription}' was removed from the end of contract ${original.contract}. `+
+          Logger.warn(`- Variable '${originalVarDescription}' was removed from the end of contract ${original.contract}. `+
                    `You should avoid deleting variables from your contracts.`);
           break;
         case 'rename':
-          log.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${updated.label} in ${updatedVarSource}.` +
+          Logger.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${updated.label} in ${updatedVarSource}.` +
                    `${updated.label} will have the value of ${original.label} after upgrading.`);
           break;
         case 'typechange':
-          log.warn(`- Variable '${original.label}' in contract ${original.contract} was changed from ${originalVarType.label} ` +
+          Logger.warn(`- Variable '${original.label}' in contract ${original.contract} was changed from ${originalVarType.label} ` +
                    `to ${updatedVarType.label} in ${updatedVarSource}. Avoid changing types of existing variables.`);
           break;
         case 'replace':
-          log.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was replaced with '${updatedVarDescription}' ` +
+          Logger.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was replaced with '${updatedVarDescription}' ` +
                    `in ${updatedVarSource}. Avoid changing existing variables.`);
           break;
         default:
-          log.error(`- Unexpected layout change: ${action}`);
+          Logger.error(`- Unexpected layout change: ${action}`);
       }
     });
 
-    log.info(`See ${STORAGE_CHECKS_LINK} for more info.`);
+    Logger.info(`See ${STORAGE_CHECKS_LINK} for more info.`);
   }
 }
 

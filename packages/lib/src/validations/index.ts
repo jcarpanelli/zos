@@ -16,7 +16,7 @@ import { hasInitialValuesInDeclarations } from './InitialValues';
 import Contract from '../artifacts/Contract.js';
 import ContractAST, { StorageInfo } from '../utils/ContractAST';
 
-const log = new Logger('validate');
+Logger.register('validate');
 
 export interface ValidationInfo {
   hasConstructor: boolean;
@@ -88,7 +88,7 @@ function tryGetUninitializedBaseContracts(contract: Contract): string[] {
 
     return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contract));
   } catch (error) {
-    log.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`);
+    Logger.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`);
     return [];
   }
 }
