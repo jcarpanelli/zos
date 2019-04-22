@@ -10,7 +10,7 @@ interface Dependencies {
   dependencies?: string[];
   installDependencies?: boolean;
 }
-
+ 
 interface PackageArgs {
   packageName?: string;
   contractAlias?: string;
@@ -59,6 +59,10 @@ export interface InitParams extends Dependencies {
   force?: boolean;
   publish?: boolean;
   packageFile?: ZosPackageFile;
+}
+
+export interface UnpackParams {
+  repoOrName: string;
 }
 
 export interface PushParams extends Network {

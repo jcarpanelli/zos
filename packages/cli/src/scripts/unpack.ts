@@ -1,0 +1,26 @@
+import process from 'process';
+
+import UnpackController from '../models/local/UnpackController';
+import { UnpackParams } from './interfaces';
+
+const nameToRepo = {
+  zepkit: 'zeppelinos/zepkit',
+};
+
+//https://github.com/zeppelinos/zepkit.git
+
+export default async function unpack({ repoOrName }: UnpackParams): Promise<void | never> {
+  repoOrName = repoOrName.toLowerCase();
+  if (!repoOrName.includes('/')) {
+    // predefined name has been passed
+    // check if it is registered
+    if (!nameToRepo.hasOwnProperty(repoOrName)) {
+      throw new Error(`Kit with such name doesn't exist`);
+    }
+    repoOrName = nameToRepo[repoOrName];
+  }
+  const url = `https://github.com/${repoOrName}.git`;
+  const controller = new UnpackController();
+  const config = await controller.verifyRepo(url);
+  await controller.unpack(url, process.cwd(), config);
+}
