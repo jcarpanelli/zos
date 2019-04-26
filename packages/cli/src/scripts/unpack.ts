@@ -15,7 +15,7 @@ export default async function unpack({ repoOrName }: UnpackParams): Promise<void
     // predefined name has been passed
     // check if it is registered
     if (!nameToRepo.hasOwnProperty(repoOrName)) {
-      throw new Error(`Kit with such name doesn't exist`);
+      throw new Error(`Kit named ${repoOrName} doesn't exist`);
     }
     repoOrName = nameToRepo[repoOrName];
   }
