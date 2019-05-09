@@ -40,19 +40,19 @@ async function commandActions(contractFullName: string, options: any) {
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 
-  const initMethodParams = await promptForMethodParams(promptedContractFullName,getCommandProps, options);
-
-  await action(promptedContractFullName, { ...options, ...initMethodParams, network, txParams });
+  await action(promptedContractFullName, { ...options, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function action(contractFullName: string, options: any) {
-  const { force, methodName, methodArgs, network, txParams } = options;
+  const { force, network, txParams } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force });
 
   if (!await hasToMigrateProject(network)) process.exit(0);
 
+  const { methodName, methodArgs } = await promptForMethodParams(contractFullName, getCommandProps, options);
+
+  const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force });
   await create({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
