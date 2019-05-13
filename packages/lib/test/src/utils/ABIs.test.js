@@ -2,12 +2,38 @@
 
 require('../../setup')
 
-import { getABIFunction as getFunction } from '../../../src/utils/ABIs'
+import { getABIFunction as getFunction, callDescription, buildCallData } from '../../../src/utils/ABIs'
 import Contracts from '../../../src/artifacts/Contracts'
 
 const should = require('chai').should()
+const ImplV1 = Contracts.getFromLocal('DummyImplementation');
+
 
 describe('ABIs', function() {
+  describe('callDescription', function () {
+    beforeEach('setup', async function() {
+      this.implV1 = await ImplV1.new();
+    });
+
+    context('when the method receives arguments', function () {
+      it('returns a string describing the call', function () {
+        const args = [42, 'foobar', [4,2]];
+        const { method } = buildCallData(this.implV1, 'initialize', args);
+        callDescription(method, args)
+          .should.eq('initialize with: \n - _value (uint256): 42\n - _text (string): "foobar"\n - _values (uint256[]): [4,2]')
+      });
+    });
+
+    context('when the method does not receive any arguments', function () {
+      it('returns a string describing the call', function () {
+        ['initializePayable', 'initializeNonPayable'].forEach(methodName => {
+          const { method } = buildCallData(this.implV1, methodName, []);
+          callDescription(method, []).should.eq(`${methodName} method with no arguments...`)
+        });
+      });
+    });
+  });
+
   describe('getABIFunction', function () {
     it('matches number of arguments', async function () {
       testGetFunction('GetFunctionBase', [1,2], ['uint256', 'uint256']);
@@ -42,6 +68,6 @@ describe('ABIs', function() {
 function testGetFunction(contractName, args, expectedTypes, funName = 'initialize') {
   const contractClass = Contracts.getFromLocal(contractName);
   const method = getFunction(contractClass, funName, args);
-  should.exist(method)
+  should.exist(method);
   method.inputs.map(m => m.type).should.be.deep.eq(expectedTypes);
 }

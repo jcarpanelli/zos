@@ -102,8 +102,12 @@ function tryGetLinearizedBaseContracts(contract: Contract): Node[] | null {
 }
 
 export function callDescription(method: any, args: string[]): string {
-  const argsDescriptions: any = method.inputs.map((input: any, index: number) => ` - ${input.name} (${input.type}): ${JSON.stringify(args[index])}`);
-  return `${method.name} with: \n${argsDescriptions.join('\n')}`;
+  const argsDescriptions = method.inputs
+    .map((input: any, index: number) => ` - ${input.name} (${input.type}): ${JSON.stringify(args[index])}`);
+
+  return argsDescriptions.length !== 0
+    ? `${method.name} with: \n${argsDescriptions.join('\n')}`
+    : `${method.name} method with no arguments...`;
 }
 
 export default {
