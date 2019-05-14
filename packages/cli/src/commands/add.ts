@@ -56,7 +56,7 @@ async function runActionIfNeeded(contractName?: string, options?: any): Promise<
 }
 
 function getCommandProps(): InquirerQuestions {
-  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromBuildDir');
+  return contractsList('contractNames', 'Pick which contracts you want to add', 'checkbox', 'fromBuildDir');
 }
 
 function splitContractName(rawData: string): { name: string, alias: string } {

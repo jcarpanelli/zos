@@ -51,7 +51,7 @@ function getCommandProps(): InquirerQuestions {
       type: 'input'
     },
     version: {
-      message: 'Choose a version:',
+      message: 'Initial version:',
       type: 'input',
     }
   };

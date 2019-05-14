@@ -71,7 +71,7 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
 }
 
 export function networksList(name: string, type: string, message?: string): { [key: string]: any } {
-  message = message || 'Select a network from the network list';
+  message = message || 'Pick a network';
   const networks = Truffle.getNetworkNamesFromConfig();
 
   return inquirerQuestion(name, message, type, networks);
@@ -85,7 +85,7 @@ export function proxiesList(pickProxyBy: string, network: string, packageFile?: 
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage)
     .map(packageName => {
-      const separator = packageName === packageFile.name ? 'Local contracts' : packageName;
+      const separator = packageName === packageFile.name ? 'Your contracts' : packageName;
       const packageList = groupedByPackage[packageName]
         .map(({ contract, address }) => {
           const name = pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
@@ -142,7 +142,7 @@ export function contractsList(name: string, message: string, type: string, sourc
         }
         return contractNames;
       });
-    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Local contracts =`));
+    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
 
     return inquirerQuestion(name, message, type, [...contractsFromBuild, ...flatten(packageContracts)]);
   } else return [];
