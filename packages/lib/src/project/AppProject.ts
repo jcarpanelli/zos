@@ -220,7 +220,7 @@ class BaseAppProject extends BasePackageProject {
     const proxyFactory = await this.ensureProxyFactory();
     const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
 
-    log.info(`Instance created at ${proxy.address}`);
+    Logger.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 

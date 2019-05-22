@@ -54,12 +54,8 @@ export default class ProxyAdmin {
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
-<<<<<<< HEAD
     await this.checkOwner();
-    log.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
-=======
     Logger.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
->>>>>>> Transform Logger class into an object
     await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
     Logger.info(`Owner for proxy admin set to ${newAdminOwner}`);
   }
