@@ -38,7 +38,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     const { initMethod: initMethodName, initArgs } = contractParams;
     const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contract, initMethodName, initArgs);
-    Logger.info(`Instance at ${pAddress} upgraded`);
+    Logger.success(`Instance at ${pAddress} upgraded`);
     return contract.at(pAddress);
   }
 

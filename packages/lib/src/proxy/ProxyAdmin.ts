@@ -22,9 +22,9 @@ export default class ProxyAdmin {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyAdmin> {
-    Logger.info('Deploying new ProxyAdmin...');
+    Logger.info('Deploying new ProxyAdmin...', 'foo');
     const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyAdmin'), [], txParams);
-    Logger.info(`Deployed ProxyAdmin at ${contract.address}`);
+    Logger.success('foo', `Deployed ProxyAdmin at ${contract.address}`);
     return new this(contract, txParams);
   }
 
@@ -41,7 +41,7 @@ export default class ProxyAdmin {
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
     Logger.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
     await Transactions.sendTransaction(this.contract.methods.changeProxyAdmin, [proxyAddress, newAdmin], { ...this.txParams });
-    Logger.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
+    Logger.success(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
   public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: Contract, initMethodName: string, initArgs: any): Promise<Contract> {

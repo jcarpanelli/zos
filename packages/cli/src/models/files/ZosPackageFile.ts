@@ -159,7 +159,7 @@ export default class ZosPackageFile {
     if(this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      exists ? Logger.info(`Updated ${this.fileName}`) : Logger.info(`Created ${this.fileName}`);
+      exists ? Logger.success(`Updated ${this.fileName}`) : Logger.success(`Created ${this.fileName}`);
     }
   }
 

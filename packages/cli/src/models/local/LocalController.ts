@@ -62,8 +62,9 @@ export default class LocalController {
   }
 
   public add(contractAlias: string, contractName: string): void {
-    Logger.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`);
+    Logger.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`, `add-${contractAlias}`);
     this.packageFile.addContract(contractAlias, contractName);
+    Logger.success(`add-${contractAlias}`, `Added ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`);
   }
 
   public addAll(): void {

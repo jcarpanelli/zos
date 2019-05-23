@@ -1,9 +1,17 @@
 import chalk from 'chalk';
+import Spinners from 'spinnies';
 
 interface LoggerOptions {
   verbose: boolean;
   silent: boolean;
 }
+
+const spinners = new Spinners({
+  color: 'yellowWright',
+  spinnerColor: 'blueBright',
+  succeedColor: 'blueBright',
+  disableEnterKey: false,
+});
 
 const Logger = {
   defaults: { verbose: false, silent: true },
@@ -21,8 +29,14 @@ const Logger = {
     this.defaults.verbose = value;
   },
 
-  info(msg: string): void {
-    this.log(msg, 'green');
+  info(msg: string, id?: string): void {
+    spinners.add(id, { text: msg });
+    // this.log(msg, 'green');
+  },
+
+  success(id: string, msg?: string): void {
+    if (!spinners.pick(id)) spinners.add(id);
+    msg ? spinners.succeed(id, { text: msg }): spinners.succeed(id);
   },
 
   warn(msg: string) {

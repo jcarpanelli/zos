@@ -51,13 +51,14 @@ export default abstract class BaseSimpleProject {
   public abstract async getAdminAddress(): Promise<string>;
 
   public async setImplementation(contract: Contract, contractName?: string): Promise<any> {
-    Logger.info(`Deploying logic contract for ${contract.schema.contractName}`);
+    Logger.info(`Deploying logic contract for ${contract.schema.contractName}`, `deploying-${contract.schema.contractName}`);
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation.address,
       bytecodeHash: bytecodeDigest(contract.schema.linkedDeployedBytecode)
     });
+    Logger.success(`deploying-${contract.schema.contractName}`, `Deployed logic contract for ${contract.schema.contractName}`);
     return implementation;
   }
 
@@ -105,7 +106,7 @@ export default abstract class BaseSimpleProject {
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
     const proxyAdmin = admin || (await this.getAdminAddress());
     const proxy = await Proxy.deploy(implementationAddress, proxyAdmin, initCallData, this.txParams);
-    Logger.info(`Instance created at ${proxy.address}`);
+    Logger.success(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -118,7 +119,7 @@ export default abstract class BaseSimpleProject {
     const adminAddress = admin || await this.getAdminAddress();
     const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData, signature);
 
-    Logger.info(`Instance created at ${proxy.address}`);
+    Logger.success(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -130,7 +131,7 @@ export default abstract class BaseSimpleProject {
     const proxyFactory = await this.ensureProxyFactory();
     const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
 
-    Logger.info(`Instance created at ${proxy.address}`);
+    Logger.success(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 

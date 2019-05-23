@@ -8,7 +8,7 @@ const state = { alreadyCompiled: false };
 const Compiler = {
   async call(force: boolean = false): Promise<{ stdout: string, stderr: string }> {
     if (force || !state.alreadyCompiled) {
-      Logger.info('Compiling contracts with Truffle...');
+      Logger.info('Compiling contracts with Truffle...', 'compilation');
       let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`;
       if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
 
@@ -22,6 +22,7 @@ const Compiler = {
             reject(error);
           } else {
             state.alreadyCompiled = true;
+            Logger.success('compilation', 'Contracts successfully compiled. Compilation logs:');
             resolve({ stdout, stderr });
           }
           if (stdout) console.log(stdout);

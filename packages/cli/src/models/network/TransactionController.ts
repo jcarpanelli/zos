@@ -12,7 +12,7 @@ import ZosNetworkFile from '../files/ZosNetworkFile';
 import Events from '../status/EventsFilter';
 
 const { buildCallData, callDescription } = ABI;
-const log = new Logger('TransactionController');
+Logger.register('TransactionController');
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -42,31 +42,31 @@ export default class TransactionController {
     }
     const validUnit = unit.toLowerCase();
     const value = toWei(amount, validUnit);
-    log.info(`Sending ${amount} ${validUnit} to ${to}...`);
+    Logger.info(`Sending ${amount} ${validUnit} to ${to}...`);
     const { transactionHash } = await Transactions.sendRawTransaction(to, { value }, this.txParams);
-    log.info(`Funds successfully sent!. Transaction hash: ${transactionHash}`);
+    Logger.info(`Funds successfully sent!. Transaction hash: ${transactionHash}`);
   }
 
   public async getBalanceOf(accountAddress: string, contractAddress?: string): Promise<void | never> {
     if (contractAddress) {
       const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(accountAddress, contractAddress);
-      log.info(`Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`);
+      Logger.info(`Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`);
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      log.info(`Balance: ${fromWei(balance, 'ether')} ETH`);
+      Logger.info(`Balance: ${fromWei(balance, 'ether')} ETH`);
     }
   }
 
   public async callContractMethod(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<string[] | object | string | never> {
     const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Logger.info(`Calling: ${callDescription(method, methodArgs)}`);
       const result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
       const parsedResult = this.parseFunctionCallResult(result);
 
       isNull(parsedResult) || isUndefined(parsedResult) || parsedResult === '()' || parsedResult.length === 0
-        ? log.info(`Method ${methodName} successfully called.`)
-        : log.info(`Call returned: ${parsedResult}`);
+        ? Logger.info(`Method ${methodName} successfully called.`)
+        : Logger.info(`Call returned: ${parsedResult}`);
 
       return result;
     } catch(error) {
@@ -77,9 +77,9 @@ export default class TransactionController {
   public async sendTransaction(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<void | never> {
     const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Logger.info(`Calling: ${callDescription(method, methodArgs)}`);
       const { transactionHash, events } = await Transactions.sendTransaction(contract.methods[methodName], methodArgs, this.txParams);
-      log.info(`Transaction successful: ${transactionHash}`);
+      Logger.info(`Transaction successful: ${transactionHash}`);
       if(!isEmpty(events)) Events.describe(events);
     } catch(error) {
       throw Error(`Error while trying to send transaction to ${proxyAddress}. ${error}`);

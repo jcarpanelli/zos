@@ -18,7 +18,7 @@ export default class EventsFilter {
         description = description.concat(`\n - ${event}(${emitted.join(', ')})`);
       });
 
-    log.info(`Events emitted: ${description}`);
+    Logger.info(`Events emitted: ${description}`);
   }
 
   constructor(timeout?: number) {
