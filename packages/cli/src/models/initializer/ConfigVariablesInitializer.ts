@@ -10,7 +10,7 @@ export interface NetworkConfig {
 
 const ConfigVariablesInitializer  = {
   initStaticConfiguration(): void {
-    const buildDir = Truffle.getBuildDir();
+    const buildDir = ZosConfig.exists() ? ZosConfig.getBuildDir() : Truffle.getBuildDir();
     Contracts.setLocalBuildDir(buildDir);
   },
 

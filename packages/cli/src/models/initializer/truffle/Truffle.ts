@@ -35,7 +35,6 @@ const Truffle = {
   async getProviderAndDefaults(): Promise<any> {
     const config = this.getConfig();
     const { provider } = config;
-    // console.log('provider', provider);
     await this._checkHdWalletProviderVersion(provider);
     const artifactDefaults = this._getArtifactDefaults(config);
 
