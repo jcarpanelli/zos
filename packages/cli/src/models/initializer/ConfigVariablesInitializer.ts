@@ -19,18 +19,18 @@ const ConfigVariablesInitializer  = {
     const { network, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
     if (!network) throw Error('A network name must be provided to execute the requested action.');
-
-    let provider, artifactDefaults;
+    let config;
 
     if (ZosConfig.exists()) {
-      ZosConfig.load(network);
-      ({ provider, artifactDefaults } = ZosConfig.load(network));
+      config  = ZosConfig.load(network);
     } else if (Truffle.existsTruffleConfig()) {
       Truffle.validateAndLoadNetworkConfig(network);
-      ({ provider, artifactDefaults } = await Truffle.getProviderAndDefaults());
+      config = await Truffle.getProviderAndDefaults();
     } else {
       throw Error('Could not find networks.js file, please remember to initialize your project.');
     }
+
+    const { provider, artifactDefaults } = config;
 
     ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);
