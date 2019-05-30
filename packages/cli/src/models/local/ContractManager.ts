@@ -1,7 +1,7 @@
 import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import ZosPackageFile from '../files/ZosPackageFile';
-import ConfigVariablesInitializer from '../config/ConfigManager';
+import ConfigManager from '../config/ConfigManager';
 
 export default class ContractManager {
   public packageFile: ZosPackageFile;
@@ -31,7 +31,7 @@ export default class ContractManager {
   }
 
   public getContractNames(): string[] {
-    const buildDir = ConfigVariablesInitializer.getBuildDir();
+    const buildDir = ConfigManager.getBuildDir();
     if (FileSystem.exists(buildDir)) {
       return FileSystem.readDir(buildDir)
         .filter(name => name.match(/\.json$/))
