@@ -2,7 +2,7 @@ import { ZWeb3 } from 'zos-lib';
 import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name: string = 'session';
 const signature: string = name;
@@ -25,7 +25,7 @@ async function action(options: any): Promise<void> {
     session({ close });
   } else {
     const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: getCommandProps() }, interactive);
-    const { network } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedNetwork, true);
+    const { network } = await ConfigManager.initNetworkConfiguration(promptedNetwork, true);
     const accounts = await ZWeb3.accounts();
     const promptedSession = await promptIfNeeded({ opts: { timeout, from, expires }, props: getCommandProps(accounts) }, interactive);
 

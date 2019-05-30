@@ -14,7 +14,7 @@ import {
   InquirerQuestions
 } from '../prompts/prompt';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name: string = 'set-admin';
 const signature: string = `${name} [alias-or-address] [new-admin-address]`;
@@ -39,7 +39,7 @@ async function action(proxyReference: string, newAdmin: string, options: any): P
 
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
 
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({ ...options, ...networkOpts });
   if (!await hasToMigrateProject(network)) process.exit(0);
 
   const { proxyReference: pickedProxyReference, newAdmin: pickedNewAdmin } = await promptForProxies(proxyReference, newAdmin, network, options);

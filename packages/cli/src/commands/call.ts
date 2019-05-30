@@ -3,7 +3,7 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import call from '../scripts/call';
 import { parseContractReference } from '../utils/contract';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, promptForNetwork, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
@@ -26,7 +26,7 @@ const register: (program: any) => any = (program) => program
 async function action(options: any): Promise<void> {
   const { interactive, to: proxyAddress } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({ ...options, ...networkOpts });
 
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
   const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options, {}, Mutability.Constant);

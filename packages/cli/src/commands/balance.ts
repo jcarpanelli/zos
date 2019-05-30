@@ -1,6 +1,6 @@
 import balance from '../scripts/balance';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import Session from '../models/network/Session';
 
 const name: string = 'balance';
@@ -25,7 +25,7 @@ async function action(accountAddress: string, options: any): Promise<void> {
   const defaults = { network: networkInSession };
   const promptedConfig = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...promptedConfig });
+  await ConfigManager.initNetworkConfiguration({ ...options, ...promptedConfig });
   await balance({ accountAddress: promptedConfig.accountAddress, contractAddress });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

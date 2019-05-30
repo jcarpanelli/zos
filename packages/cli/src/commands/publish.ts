@@ -1,5 +1,5 @@
 import publish from '../scripts/publish';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { hasToMigrateProject } from '../prompts/migrations';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
@@ -24,7 +24,7 @@ async function action(options: any): Promise<void> {
   const props = getCommandProps();
 
   const promptedOpts = await promptIfNeeded({ opts, defaults, props }, interactive);
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(promptedOpts);
   if (!await hasToMigrateProject(network)) process.exit(0);
 
   await publish({ network, txParams });

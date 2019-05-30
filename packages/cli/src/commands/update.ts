@@ -4,7 +4,7 @@ import push from './push';
 import update from '../scripts/update';
 import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { UpdatePropsParams, UpdateSelectionParams } from './interfaces';
 import {
   promptIfNeeded,
@@ -37,7 +37,7 @@ const register: (program: any) => any = (program) => program
 
 async function commandActions(proxyReference: string, options: any): Promise<void> {
   const { network: promptedNetwork } = await promptForNetwork(options, () => getCommandProps());
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNetwork });
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({ ...options, network: promptedNetwork });
 
   await push.runActionIfNeeded(null, network, { ...options, network: promptedNetwork, force: true });
 

@@ -2,7 +2,7 @@ import { ZWeb3 } from 'zos-lib';
 import transfer from '../scripts/transfer';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name: string = 'transfer';
 const signature: string = name;
@@ -24,7 +24,7 @@ async function action(options: any): Promise<void> {
   const configOpts = { network: networkInOpts, from };
   const configProps = getCommandProps();
   const promptedConfig = await promptIfNeeded({ opts: configOpts, props: configProps }, interactive);
-  const { txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedConfig, true);
+  const { txParams } = await ConfigManager.initNetworkConfiguration(promptedConfig, true);
 
   const transferOpts = { from, to, value };
   const transferProps = getCommandProps(await ZWeb3.accounts(), unit);

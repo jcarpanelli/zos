@@ -9,7 +9,7 @@ import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'push';
@@ -45,7 +45,7 @@ async function action(options: any): Promise<void> {
   if (!options.skipCompile) await Compiler.call();
 
   const prompted = await promptIfNeeded({ opts, defaults, props }, interactive);
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...prompted });
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({ ...options, ...prompted });
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
   await push({ deployProxyAdmin, deployProxyFactory, force, reupload, network, txParams, ...promptDeployDependencies });
