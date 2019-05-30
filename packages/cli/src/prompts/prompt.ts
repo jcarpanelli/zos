@@ -7,7 +7,8 @@ import inquirer from 'inquirer';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
 
 import Session from '../models/network/Session';
-import Truffle from '../models/initializer/truffle/Truffle';
+// import Truffle from '../models/initializer/truffle/Truffle';
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
@@ -75,7 +76,7 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
 
 export function networksList(name: string, type: string, message?: string): { [key: string]: any } {
   message = message || 'Select a network from the network list';
-  const networks = Truffle.getNetworkNamesFromConfig();
+  const networks = ConfigVariablesInitializer.getNetworkNamesFromConfig();
 
   return inquirerQuestion(name, message, type, networks);
 }
@@ -114,7 +115,8 @@ export function proxiesList(pickProxyBy: string, network: string, packageFile?: 
 // Generate a list of contracts names
 export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
   const localPackageFile = new ZosPackageFile();
-  const contractsFromBuild = Truffle.getContractNames();
+  const contractManager = new ContractManager(localPackageFile);
+  const contractsFromBuild = contractManager.getContractNames();
   const contractsFromLocal = Object
     .keys(localPackageFile.contracts)
     .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
