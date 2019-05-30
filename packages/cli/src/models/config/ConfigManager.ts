@@ -9,20 +9,6 @@ export interface NetworkConfig {
 }
 
 const ConfigManager = {
-  setBaseConfig(): void | never {
-    if (this.config) return;
-
-    const zosConfig = new ZosConfig();
-    const truffleConfig = new TruffleConfig();
-    if (zosConfig.exists()) {
-      this.config = zosConfig;
-    } else if (truffleConfig.existsTruffleConfig()) {
-      this.config = truffleConfig;
-    } else {
-      throw Error('Could not find networks.js file, please remember to initialize your project.');
-    }
-  },
-
   initStaticConfiguration(): void {
     this.setBaseConfig();
     const buildDir = this.config.getBuildDir();
@@ -61,6 +47,21 @@ const ConfigManager = {
     this.setBaseConfig();
     const config = this.config.getConfig();
     return config && config.networks ? Object.keys(config.networks) : undefined;
+  },
+
+  setBaseConfig(): void | never {
+    if (this.config) return;
+
+    // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
+    const zosConfig = new ZosConfig();
+    const truffleConfig = new TruffleConfig();
+    if (zosConfig.exists()) {
+      this.config = zosConfig;
+    } else if (truffleConfig.existsTruffleConfig()) {
+      this.config = truffleConfig;
+    } else {
+      throw Error('Could not find networks.js file, please remember to initialize your project.');
+    }
   },
 };
 
