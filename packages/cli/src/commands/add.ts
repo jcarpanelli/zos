@@ -1,9 +1,9 @@
 import push from './push';
 import add from '../scripts/add';
 import addAll from '../scripts/add-all';
-import Truffle from '../models/initializer/truffle/Truffle';
+import Truffle from '../models/config/Truffle';
 import Compiler from '../models/compiler/Compiler';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ZosPackageFile from '../models/files/ZosPackageFile';

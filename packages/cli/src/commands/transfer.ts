@@ -2,7 +2,7 @@ import { ZWeb3 } from 'zos-lib';
 import transfer from '../scripts/transfer';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name: string = 'transfer';
 const signature: string = name;

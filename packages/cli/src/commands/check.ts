@@ -1,6 +1,6 @@
 import check from '../scripts/check';
 import Compiler from '../models/compiler/Compiler';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name: string = 'check';
 const signature: string = `${name} [contract]`;

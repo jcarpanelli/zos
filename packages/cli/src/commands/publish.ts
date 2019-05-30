@@ -1,5 +1,5 @@
 import publish from '../scripts/publish';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { hasToMigrateProject } from '../prompts/migrations';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';

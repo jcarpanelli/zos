@@ -9,7 +9,7 @@ import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'push';

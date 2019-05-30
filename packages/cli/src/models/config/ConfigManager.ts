@@ -1,5 +1,5 @@
 import { ZWeb3, Contracts, TxParams } from 'zos-lib';
-import TruffleConfig from './truffle/Truffle';
+import TruffleConfig from './Truffle';
 import Session from '../network/Session';
 import ZosConfig from './ZosConfig';
 
@@ -8,7 +8,7 @@ export interface NetworkConfig {
   txParams: TxParams;
 }
 
-const ConfigVariablesInitializer = {
+const ConfigManager = {
   setBaseConfig(): void | never {
     if (this.config) return;
 
@@ -64,4 +64,4 @@ const ConfigVariablesInitializer = {
   },
 };
 
-export default ConfigVariablesInitializer;
+export default ConfigManager;

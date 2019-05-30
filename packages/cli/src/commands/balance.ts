@@ -1,6 +1,6 @@
 import balance from '../scripts/balance';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import Session from '../models/network/Session';
 
 const name: string = 'balance';

@@ -2,7 +2,7 @@ import pickBy from 'lodash.pickby';
 
 import sendTx from '../scripts/send-tx';
 import { parseContractReference } from '../utils/contract';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, promptForNetwork, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';

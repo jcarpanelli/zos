@@ -1,7 +1,7 @@
 import pickBy from 'lodash.pickby';
 
 import verify from '../scripts/verify';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'verify';
