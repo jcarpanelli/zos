@@ -23,12 +23,21 @@ const ConfigManager = {
 
     const { provider, artifactDefaults } = await this.config.loadNetworkConfig(network, root);
 
-    ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
-    const txParams = { from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || await ZWeb3.defaultAccount()) };
-    return { network: await ZWeb3.getNetworkName(), txParams };
+    try {
+      ZWeb3.initialize(provider);
+      const txParams = { from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || await ZWeb3.defaultAccount()) };
+      return { network: await ZWeb3.getNetworkName(), txParams };
+    } catch(error) {
+      if (this.config.constructor.name === 'ZosConfig') {
+        const message = `Could not connect to ${network}. Please check that your Ethereum client:\n - is running\n - is accepting RPC connections (i.e., "--rpc" option is used in geth)\n - is accessible over the network\n - is properly configured in your networks.js file`;
+        error.message = `${message}\n${error.message}`;
+        throw error;
+      } else throw error;
+    }
+
   },
 
   getBuildDir(root: string = process.cwd()) {
