@@ -9,19 +9,19 @@ export interface NetworkConfig {
 }
 
 const ConfigManager = {
-  initStaticConfiguration(): void {
-    this.setBaseConfig();
+  initStaticConfiguration(root: string = process.cwd()): void {
+    this.setBaseConfig(root);
     const buildDir = this.config.getBuildDir();
     Contracts.setLocalBuildDir(buildDir);
   },
 
-  async initNetworkConfiguration(options: any, silent?: boolean): Promise<NetworkConfig> {
-    this.initStaticConfiguration();
+  async initNetworkConfiguration(options: any = {}, silent?: boolean, root: string = process.cwd()): Promise<NetworkConfig> {
+    this.initStaticConfiguration(root);
     const { network, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
     if (!network) throw Error('A network name must be provided to execute the requested action.');
 
-    const { provider, artifactDefaults } = await this.config.loadNetworkConfig(network);
+    const { provider, artifactDefaults } = await this.config.loadNetworkConfig(network, root);
 
     ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);
@@ -31,33 +31,33 @@ const ConfigManager = {
     return { network: await ZWeb3.getNetworkName(), txParams };
   },
 
-  getBuildDir() {
-    this.setBaseConfig();
+  getBuildDir(root: string = process.cwd()) {
+    this.setBaseConfig(root);
     return this.config.getBuildDir();
   },
 
-  getCompilerInfo(): { version?: string, optimizer?: boolean, optimizerRuns?: number } {
-    this.setBaseConfig();
+  getCompilerInfo(root: string = process.cwd()): { version?: string, optimizer?: boolean, optimizerRuns?: number } {
+    this.setBaseConfig(root);
     const { compilers: { solc: { version, settings } } } = this.config.getConfig();
     const { enabled: optimizer, runs: optimizerRuns } = settings.optimizer;
     return { version, optimizer, optimizerRuns };
   },
 
-  getNetworkNamesFromConfig(): string[] | null {
-    this.setBaseConfig();
+  getNetworkNamesFromConfig(root: string = process.cwd()): string[] | null {
+    this.setBaseConfig(root);
     const config = this.config.getConfig();
     return config && config.networks ? Object.keys(config.networks) : undefined;
   },
 
-  setBaseConfig(): void | never {
+  setBaseConfig(root: string = process.cwd()): void | never {
     if (this.config) return;
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
     const zosConfig = new ZosConfig();
     const truffleConfig = new TruffleConfig();
-    if (zosConfig.exists()) {
+    if (zosConfig.exists(root)) {
       this.config = zosConfig;
-    } else if (truffleConfig.existsTruffleConfig()) {
+    } else if (truffleConfig.existsTruffleConfig(root)) {
       this.config = truffleConfig;
     } else {
       throw Error('Could not find networks.js file, please remember to initialize your project.');
