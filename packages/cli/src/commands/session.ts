@@ -1,7 +1,6 @@
 import { ZWeb3 } from 'zos-lib';
 import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
-import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
 
 const name: string = 'session';
