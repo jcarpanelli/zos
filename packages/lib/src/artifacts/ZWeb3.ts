@@ -1,5 +1,5 @@
 import path from 'path';
-import { Loggy, SpinnerAction, LogType }from '../utils/Logger';
+import { Loggy, SpinnerAction, LogType } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';

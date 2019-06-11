@@ -7,7 +7,7 @@ import values from 'lodash.values';
 import flatten from 'lodash.flatten';
 import uniq from 'lodash.uniq';
 
-import { Loggy, SpinnerAction, LogType }from '../utils/Logger';
+import { Loggy, SpinnerAction, LogType } from '../utils/Logger';
 import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getUninitializedBaseContracts } from './Initializers';

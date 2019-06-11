@@ -118,10 +118,7 @@ export default class ImplementationDirectory {
       [],
       { ...this.txParams },
     );
-    Loggy.succeed(
-      `freeze-implementation`,
-      `Directory version frozen`,
-    );
+    Loggy.succeed(`freeze-implementation`, `Directory version frozen`);
   }
 
   public async isFrozen(): Promise<boolean> {

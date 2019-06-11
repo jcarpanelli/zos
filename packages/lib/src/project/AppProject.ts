@@ -68,7 +68,7 @@ class BaseAppProject extends BasePackageProject {
       if (appAddress) {
         app = await App.fetch(appAddress, txParams);
       } else {
-        Loggy.add(
+        Loggy.spin.warn(
           `${fileName}#fetchOrDeploy`,
           `publish-project`,
           'Preparing everything to publish the project! Deploying new App contract',

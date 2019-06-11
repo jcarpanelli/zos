@@ -39,7 +39,7 @@ interface UpdateParams {
   text?: string;
 }
 
-export const Loggy = {
+export const Loggy: { [key: string]: any } = {
   silent(value: boolean): void {
     this.isSilent = value;
   },
@@ -64,22 +64,7 @@ export const Loggy = {
     } else this.add(file, reference, text, logInfo);
   },
 
-  add(
-    file: string,
-    reference: string,
-    text: string,
-    { logLevel, logType, spinnerAction }: LogInfo = {
-      logLevel: LogLevel.Normal,
-      logType: LogType.Info,
-      spinnerAction: SpinnerAction.Add,
-    },
-  ): void {
-    if (!logLevel) logLevel = LogLevel.Normal;
-    if (!logType) logType = LogType.Info;
-    if (!spinnerAction) spinnerAction = SpinnerAction.Add;
-    this[reference] = { file, text, logLevel, logType, spinnerAction };
-    this._log(reference);
-  },
+  add,
 
   update(
     reference: string,
@@ -143,6 +128,75 @@ export const Loggy = {
     }
   },
 };
+
+const spinnerActions = {
+  spin: SpinnerAction.Add,
+  noSpin: SpinnerAction.NonSpinnable,
+};
+
+const logTypes = {
+  info: LogType.Info,
+  warn: LogType.Warn,
+  error: LogType.Err,
+};
+
+Object.keys(spinnerActions).forEach(spinnerAction => {
+  Object.keys(logTypes).forEach(logType => {
+    if (!Loggy[spinnerAction]) {
+      Loggy[spinnerAction] = (
+        file: string,
+        reference: string,
+        text: string,
+      ): void =>
+        Loggy.add(file, reference, text, {
+          spinnerAction: spinnerActions[spinnerAction],
+        });
+    }
+
+    Loggy[spinnerAction][logType] = (
+      file: string,
+      reference: string,
+      text: string,
+    ): void =>
+      Loggy.add(file, reference, text, {
+        spinnerAction: spinnerActions[spinnerAction],
+        logType: logTypes[logType],
+      });
+  });
+});
+
+function addOrUpdate(
+  file: string,
+  reference: string,
+  text: string,
+  logInfo: LogInfo = {
+    logLevel: LogLevel.Normal,
+    logType: LogType.Info,
+    spinnerAction: SpinnerAction.Add,
+  },
+): void {
+  if (this[reference]) {
+    const { spinnerAction } = logInfo;
+    this.update(reference, { spinnerAction, text }, file);
+  } else this.add(file, reference, text, logInfo);
+}
+
+function add(
+  file: string,
+  reference: string,
+  text: string,
+  { logLevel, logType, spinnerAction }: LogInfo = {
+    logLevel: LogLevel.Normal,
+    logType: LogType.Info,
+    spinnerAction: SpinnerAction.Add,
+  },
+): void {
+  if (!logLevel) logLevel = LogLevel.Normal;
+  if (!logType) logType = LogType.Info;
+  if (!spinnerAction) spinnerAction = SpinnerAction.Add;
+  this[reference] = { file, text, logLevel, logType, spinnerAction };
+  this._log(reference);
+}
 
 interface LoggerOptions {
   verbose: boolean;
