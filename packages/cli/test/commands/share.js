@@ -33,6 +33,7 @@ import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigManager from '../../src/models/config/ConfigManager';
+import * as telemetry from '../../src/telemetry';
 
 program.Command.prototype.parseReset = function() {
   var self = this;
@@ -101,6 +102,7 @@ exports.stubCommands = function() {
       .get(function getterFn() {
         return projectFile;
       });
+    this.report = sinon.stub(telemetry, 'report').returns(undefined);
   });
 
   afterEach('restore', function() {
